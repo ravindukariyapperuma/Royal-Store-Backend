@@ -1,14 +1,15 @@
-const http = require('http');
+const express = require("express");
 
-const hostname = '127.0.0.1';
-const port = 3000;
+const app = express();
+const cors = require("cors");
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World');
-});
+//Initialize DB
+require("./DbConnection/dbCon")();
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+
+app.listen(process.env.PORT, () => {
+  console.log("Server started on port " + process.env.PORT);
 });
