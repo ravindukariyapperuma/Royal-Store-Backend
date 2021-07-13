@@ -1,7 +1,10 @@
+const { v4: uuidv4 } = require('uuid');
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const User = require("../Models/User.model");
+
+const TokenMiddleware = require('../Middlewares/Token.middleware');
 
 module.exports = {
   /*
@@ -23,6 +26,7 @@ module.exports = {
    */
   createNewUser: async (req, res, next) => {
     const newUser = {
+      userId: uuidv4(),
       name: req.body.name,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),
@@ -36,7 +40,12 @@ module.exports = {
       } else {
         const user = new User(newUser);
         const result = await user.save();
-        res.status(201).send(result);
+        const token = await TokenMiddleware.generateToken(user);
+        res.status(201).json({
+          message: 'SUCCESS',
+          data: result,
+          token: token,
+        });
       }
     } catch (error) {
       res.send(error);
