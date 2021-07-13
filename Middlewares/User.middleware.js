@@ -1,5 +1,7 @@
 var validator = require("email-validator");
 
+const User = require("../Models/User.model");
+
 module.exports = {
   validate: async (req, res, next) => {
     try {
@@ -46,10 +48,27 @@ module.exports = {
         }
       }
 
+      if (req.body.phone == undefined || req.body.phone == "") {
+        throw new Error("Please enter your phone number");
+      }
+
+      if (req.body.userType == undefined || req.body.userType == "") {
+        throw new Error("Please enter your user type");
+      } else {
+        if (req.body.userType != "admin" && req.body.userType != "customer") {
+          throw new Error("User type should be customer or admin");
+        }
+      }
+
+      const sameUsers = await User.find({ email: req.body.email });
+      if (sameUsers.length != 0) {
+        throw new Error("Email already registered");
+      }
+      
       next();
     } catch (error) {
       res.status(400).json({
-        message: "fail",
+        message: "Fail",
         error: error.message,
       });
       return;

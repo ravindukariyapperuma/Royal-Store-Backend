@@ -18,6 +18,10 @@ const UserSchema = new Schema({
     type: String,
     required: [true, "A user must have a password"],
   },
+  phone: {
+    type: String,
+    required: [true, "A user must have phone"],
+  },
   userType: {
     type: String,
     enum: {

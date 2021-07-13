@@ -3,18 +3,39 @@ const router = express.Router();
 
 const UserController = require("../Controllers/User.controller");
 
-const UserMiddleware = require('../Middlewares/User.middleware');
-const TokenMiddleware = require('../Middlewares/Token.middleware');
+const UserMiddleware = require("../Middlewares/User.middleware");
+const TokenMiddleware = require("../Middlewares/Token.middleware");
+const PermissionMiddleware = require("../Middlewares/Permission.middleware");
 
-/*
- * method: GET
- * Description: Get a list of all users
+/**
+ * @api {get} /users/
+ * @apiName Get all users
+ * @apiPermission Admin
+ * @apiGroup User
+ *
+ * @apiSuccess (200)
  */
-router.get("/", TokenMiddleware.verifyToken, UserController.getAllUsers);
+router.get(
+  "/",
+  TokenMiddleware.verifyToken,
+  PermissionMiddleware.adminOnly,
+  UserController.getAllUsers
+);
 
-/*
- * method: POST
- * Description: Create a new user
+/**
+ * @api {post} /users/
+ * @apiName Create new user
+ * @apiPermission All
+ * @apiGroup User
+ *
+ * @apiParam  {String} [name] username
+ * @apiParam  {String} [email] Email
+ * @apiParam  {String} [password] Password
+ * @apiParam  {String} [confirmPassword] Confirm Password
+ * @apiParam  {String} [phone] Phone number
+ * @apiParam  {String} [userType] User Type
+ *
+ * @apiSuccess (201) {Object} mixed `User` object
  */
 router.post("/", UserMiddleware.validate, UserController.createNewUser);
 

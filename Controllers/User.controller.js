@@ -1,28 +1,47 @@
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const User = require("../Models/User.model");
 
-const TokenMiddleware = require('../Middlewares/Token.middleware');
-
 module.exports = {
-  /*
-   * method: GET
-   * Description: Get a list of all users
+  /**
+   * @api {get} /users/
+   * @apiName Get all users
+   * @apiPermission Admin
+   * @apiGroup User
+   *
+   * @apiSuccess (200)
    */
   getAllUsers: async (req, res, next) => {
     try {
       const results = await User.find();
-      res.send(results);
+      res.status(200).json({
+        message: "Success",
+        data: results,
+      });
     } catch (error) {
-      res.send(error);
+      res.status(400).json({
+        message: "Fail",
+        error: error.message,
+      });
     }
   },
 
-  /*
-   * method: POST
-   * Description: Create a new user
+  /**
+   * @api {post} /users/
+   * @apiName Create new user
+   * @apiPermission All
+   * @apiGroup User
+   *
+   * @apiParam  {String} [name] username
+   * @apiParam  {String} [email] Email
+   * @apiParam  {String} [password] Password
+   * @apiParam  {String} [confirmPassword] Confirm Password
+   * @apiParam  {String} [phone] Phone number
+   * @apiParam  {String} [userType] User Type
+   *
+   * @apiSuccess (201) {Object} mixed `User` object
    */
   createNewUser: async (req, res, next) => {
     const newUser = {
@@ -30,25 +49,21 @@ module.exports = {
       name: req.body.name,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),
+      phone: req.body.phone,
+      userType: req.body.userType,
     };
     try {
-      const sameUsers = await User.find({ email: req.body.email });
-      if (sameUsers.length != 0) {
-        res.status(200).json({
-          message: "ALREADYTAKEN",
-        });
-      } else {
-        const user = new User(newUser);
-        const result = await user.save();
-        const token = await TokenMiddleware.generateToken(user);
-        res.status(201).json({
-          message: 'SUCCESS',
-          data: result,
-          token: token,
-        });
-      }
+      const user = new User(newUser);
+      const result = await user.save();
+      res.status(201).json({
+        message: "Success",
+        data: result,
+      });
     } catch (error) {
-      res.send(error);
+      res.status(400).json({
+        message: "Fail",
+        error: error.message,
+      });
     }
   },
 
