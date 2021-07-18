@@ -12,6 +12,7 @@ app.use(cors());
  * Description: Connect Database to the system
  */
 require("./DbConnection/dbCon")();
+require('./Supports/reports.support')();
 
 /*
  * Name: UserRoute
@@ -22,5 +23,5 @@ const UserRoute = require("./Routes/User.route");
 app.use("/users", UserRoute);
 
 app.listen(process.env.PORT, () => {
-  console.log("Server started on port " + process.env.PORT);
+  console.log("🚀 Server started on port " + process.env.PORT);
 });

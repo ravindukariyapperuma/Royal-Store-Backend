@@ -12,25 +12,27 @@ module.exports = () => {
       useFindAndModify: process.env.USE_FIND_AND_MODIFY,
     })
     .then(() => {
-      console.log("Mongodb connected");
+      console.log("🍂 Mongodb connected");
     })
     .catch((err) => console.log(err.message));
 
   mongoose.connection.on("connected", () => {
-    console.log("Mongoose connected to db");
+    console.log("🐁 Mongoose connected to db");
   });
 
   mongoose.connection.on("error", (err) => {
-    console.log(err.message);
+    console.log("❌ error - ", err.message);
   });
 
   mongoose.connection.on("disconnected", () => {
-    console.log("Mongoose connection is disconnected");
+    console.log("🔴 Mongoose connection is disconnected");
   });
 
   process.on("SIGINT", () => {
     mongoose.connection.close(() => {
-      console.log("Mongoose connection is disconnected due to app termination");
+      console.log(
+        "⛔ Mongoose connection is disconnected due to app termination"
+      );
       process.exit(0);
     });
   });
