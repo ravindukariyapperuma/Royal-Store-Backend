@@ -1,4 +1,5 @@
 const express = require("express");
+const dotenv = require("dotenv").config();
 
 const app = express();
 const cors = require("cors");
@@ -12,7 +13,7 @@ app.use(cors());
  * Description: Connect Database to the system
  */
 require("./DbConnection/dbCon")();
-require('./Supports/reports.support')();
+require('./Helpers/reports.helper')();
 
 /*
  * Name: UserRoute
@@ -21,6 +22,9 @@ require('./Supports/reports.support')();
  */
 const UserRoute = require("./Routes/User.route");
 app.use("/users", UserRoute);
+
+const ForgotPasswordRoute = require("./Routes/ForgotPassword.route");
+app.use("/forgot-password", ForgotPasswordRoute);
 
 app.listen(process.env.PORT, () => {
   console.log("🚀 Server started on port " + process.env.PORT);

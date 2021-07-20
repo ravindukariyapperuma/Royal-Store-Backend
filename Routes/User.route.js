@@ -17,7 +17,7 @@ const PermissionMiddleware = require("../Middlewares/Permission.middleware");
  */
 router.get(
   "/",
-  TokenMiddleware.verifyToken,
+  TokenMiddleware.verifyAuthToken,
   PermissionMiddleware.adminOnly,
   UserController.getAllUsers
 );

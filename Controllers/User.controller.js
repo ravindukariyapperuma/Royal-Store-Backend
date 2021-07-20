@@ -76,7 +76,7 @@ module.exports = {
     try {
       const user = await User.findById(id);
       if (!user) {
-        res.status(204).send("Empty Products");
+        res.status(204).send("Empty user");
       } else {
         res.status(200).send(user);
       }
