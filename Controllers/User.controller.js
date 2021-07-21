@@ -1,8 +1,9 @@
-const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 
 const User = require("../Models/User.model");
+
+const hashHelper = require("../Helpers/hash.helper");
+const idHelper = require("../Helpers/id.helper");
 
 module.exports = {
   /**
@@ -45,10 +46,13 @@ module.exports = {
    */
   createNewUser: async (req, res, next) => {
     const newUser = {
-      userId: uuidv4(),
+      userId: await idHelper.generateUUID,
       name: req.body.name,
       email: req.body.email,
-      password: bcrypt.hashSync(req.body.password, 10),
+      password: await hashHelper.generateHash(
+        req.body.password,
+        Number(process.env.SALT_ROUNDS)
+      ),
       phone: req.body.phone,
       userType: req.body.userType,
     };
@@ -95,7 +99,10 @@ module.exports = {
       const updates = {
         name: req.body.name,
         email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 10),
+        password: await hashHelper.generateHash(
+          req.body.password,
+          Number(process.env.SALT_ROUNDS)
+        ),
       };
       const options = { new: true };
       const result = await User.findByIdAndUpdate(id, updates, options);

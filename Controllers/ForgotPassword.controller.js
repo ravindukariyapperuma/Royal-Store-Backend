@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 const User = require("../Models/User.model");
+
+const tokensHelper = require("../Helpers/tokens.helper");
+const hashHelper = require("../Helpers/hash.helper");
 
 module.exports = {
   sendLink: async (req, res, next) => {
@@ -17,12 +18,16 @@ module.exports = {
       email: existingUser[0].email,
       id: existingUser[0]._id,
     };
-    const token = jwt.sign(payload, secret, {
-      expiresIn: process.env.JWT_EXPIRES_IN_ONETIME,
-    });
-    const link = `${process.env.FRONTEND_URL}/forgot-password/reset-password/${existingUser[0]._id}/${token}`;
+    const token = await tokensHelper.generateToken(
+      payload,
+      secret,
+      process.env.JWT_EXPIRES_IN_ONETIME
+    );
+    const link = `${process.env.FRONTEND_URL}/reset-password/${existingUser[0]._id}/${token}`;
     console.log(link);
-    res.send("Password reset link has been sent to your email");
+    res.status(200).json({
+      message: "Password reset link has been sent to your email",
+    });
   },
 
   resetPassword: async (req, res, next) => {
@@ -35,11 +40,16 @@ module.exports = {
     }
     const secret = process.env.JWT_FORGOT_SECRET + existingUser[0].password;
     try {
-      const payload = jwt.verify(token, secret);
+      const payload = await tokensHelper.verifyToken(token, secret);
       const options = { new: true };
       const result = await User.findByIdAndUpdate(
         payload.id,
-        { password: bcrypt.hashSync(password, 10) },
+        {
+          password: await hashHelper.generateHash(
+            password,
+            Number(process.env.SALT_ROUNDS)
+          ),
+        },
         options
       );
       res.status(200).json({
