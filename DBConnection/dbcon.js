@@ -1,14 +1,15 @@
 const mongoose = require("mongoose");
+const config = require("../Configs/config");
 
 module.exports = () => {
   mongoose
-    .connect(process.env.MONGODB_URI, {
-      dbName: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      pass: process.env.DB_PASS,
-      useNewUrlParser: process.env.USE_NEW_URL_PARSER,
-      useUnifiedTopology: process.env.USE_UNIFIED_TOPOLOGY,
-      useFindAndModify: process.env.USE_FIND_AND_MODIFY,
+    .connect(config.db.uri, {
+      dbName: config.db.name,
+      user: config.db.user,
+      pass: config.db.password,
+      useNewUrlParser: config.db.useNewUrl,
+      useUnifiedTopology: config.db.useUnifiedTopology,
+      useFindAndModify: config.db.useFindAndModify,
     })
     .then(() => {
       console.log("🍂 Mongodb connected");
